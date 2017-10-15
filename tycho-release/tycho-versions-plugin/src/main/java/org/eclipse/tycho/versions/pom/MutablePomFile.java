@@ -57,8 +57,13 @@ public class MutablePomFile {
         if (this.version == null) {
             this.version = this.getParentVersion();
             this.preferExplicitProjectVersion = false;
-        } else {
-            this.preferExplicitProjectVersion = this.version.equals(this.getParentVersion());
+        } else {            
+            //this.preferExplicitProjectVersion = this.version.equals(this.getParentVersion());
+            // The assumption above is invalid: parent version could also equal by chance without any semantic relation.
+            // In addition, it causes some weird issues when using it together with the update-parent goal of the maven versions plugin:
+            // When executing update-parent -> set-version -> update-parent -> set-version in this order, the last set version fails to update MANIFESTs
+            // It's better to keep the current state, so that the user can decide if he deletes the explicit version manually.
+            this.preferExplicitProjectVersion = true;
         }
     }
 
